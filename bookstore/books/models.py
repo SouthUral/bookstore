@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.db.models import UniqueConstraint
 
 
 # Create your models here.
@@ -13,6 +14,7 @@ class Author(models.Model):
     class Meta:
         verbose_name = "Имя автора"
         verbose_name_plural = "Авторы"
+        ordering = ['id']
 
 
 class Genre(models.Model):
@@ -25,6 +27,7 @@ class Genre(models.Model):
     class Meta:
         verbose_name = "Жанр"
         verbose_name_plural = "Жанры"
+        ordering = ['id']
 
 
 class Book(models.Model):
@@ -41,11 +44,13 @@ class Book(models.Model):
     class Meta:
         verbose_name = "Книга"
         verbose_name_plural = "Книги"
-        constrains = [
-            models.UniqueConstraint(
-                fields=["title", "author"], name="unique_book"
-            )
-        ]
+        ordering = ['id']
+        """Установлены ограничения на уникальность полей в одной таблице"""
+        # constraints = [
+        #     UniqueConstraint(
+        #         fields=["title", "author"], name="unique_book"
+        #     ),
+        # ]
 
 
 class City(models.Model):
@@ -59,6 +64,7 @@ class City(models.Model):
     class Meta:
         verbose_name = "Город"
         verbose_name_plural = "Города"
+        ordering = ['id']
 
 
 class Client(models.Model):
@@ -73,11 +79,12 @@ class Client(models.Model):
     class Meta:
         verbose_name = "Клиент"
         verbose_name_plural = "Клиенты"
+        ordering = ['id']
 
 
 class Order(models.Model):
     id = models.AutoField(primary_key=True)
-    description = models.CharField(max_length=100, verbose_name="Комментарии к заказу")
+    description = models.CharField(max_length=100, verbose_name="Комментарии к заказу", blank=True, null=True)
     client = models.ForeignKey(Client, related_name="order", on_delete=models.SET_NULL, null=True, verbose_name="Клиент")
 
     def __str__(self):
@@ -86,6 +93,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
+        ordering = ['id']
 
 
 class Сontent_order(models.Model):
@@ -93,6 +101,9 @@ class Сontent_order(models.Model):
     order = models.ForeignKey(Order, related_name="content_order", on_delete=models.SET_NULL, null=True, verbose_name="Заказ")
     book = models.ForeignKey(Book, related_name="content_order", on_delete=models.SET_NULL, null=True, verbose_name="Книга")
     amount = models.IntegerField(verbose_name="Количество")
+
+    class Meta:
+        ordering = ['id']
 
 
 class Order_step(models.Model):
@@ -106,8 +117,8 @@ class Order_step(models.Model):
     id = models.AutoField(primary_key=True)
     order = models.ForeignKey(Order, related_name="order_step", verbose_name="Заказ", on_delete=models.CASCADE)
     step = models.CharField(choices=steps, max_length=30, default="buy", verbose_name="Этап")
-    date_step_beg = models.DateField(verbose_name="Дата начала этапа", auto_now_add=True, null=True)
-    date_step_end = models.DateField(verbose_name="Дата завершения этапа", blank=False, null=True)
+    date_step_beg = models.DateField(verbose_name="Дата начала этапа", blank=True, null=True)
+    date_step_end = models.DateField(verbose_name="Дата завершения этапа", blank=True, null=True)
 
     def __str__(self):
         return f"{self.step}: {self.date_step_beg}|{self.date_step_end}"
@@ -115,8 +126,7 @@ class Order_step(models.Model):
     class Meta:
         verbose_name = "Этап"
         verbose_name_plural = "Этапы"
-        constrains = [
-            models.UniqueConstraint(
-                fields=["order", "step"], name="unique_step_order"
-            )
+        ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(fields=["order", "step"], name="unique_element")
         ]
