@@ -36,7 +36,7 @@ class CitySerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = "__all__"
+        fields = ('id', 'description', 'client')
 
 
 class Сontent_orderSerializer(serializers.ModelSerializer):
